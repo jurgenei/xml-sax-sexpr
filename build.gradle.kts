@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "name.jurgenei.xml"
-version = "0.1.0-SNAPSHOT"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
@@ -37,7 +37,7 @@ publishing {
             from(components["java"])
 
             pom {
-                name.set("xml-sax-sexpr")
+                name.set("sax-sexpr")
                 description.set("SAX parser/serializer and XMLReader for bracket-based XML/XDM S-expressions")
                 url.set("https://github.com/jurgenei/xml-sax-sexpr")
 
