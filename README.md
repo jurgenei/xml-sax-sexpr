@@ -1,8 +1,8 @@
 # xml-sax-sexpr
 
-[![Build](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/ci.yml/badge.svg)](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/ci.yml)
+[![Build](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/ci.yml/badge.svg?branch=release/0.1.0)](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/ci.yml?query=branch%3Arelease%2F0.1.0)
 [![Release](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/release.yml/badge.svg)](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/release.yml)
-[![Coverage](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/coverage.yml/badge.svg)](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/coverage.yml)
+[![Coverage](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/coverage.yml/badge.svg?branch=release/0.1.0)](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/coverage.yml?query=branch%3Arelease%2F0.1.0)
 [![Maven Central](https://img.shields.io/maven-central/v/name.jurgenei.xml/xml-sax-sexpr.svg)](https://search.maven.org/artifact/name.jurgenei.xml/xml-sax-sexpr)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
