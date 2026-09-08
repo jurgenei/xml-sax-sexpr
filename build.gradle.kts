@@ -1,5 +1,8 @@
+import org.gradle.api.GradleException
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.testing.Test
+import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
 import org.gradle.testing.jacoco.tasks.JacocoReport
@@ -141,5 +144,28 @@ tasks.register("coverage") {
 
 tasks.named("check") {
     dependsOn(tasks.named("jacocoTestCoverageVerification"))
+}
+
+val stageCentralBundleRepo by tasks.registering(Sync::class) {
+    dependsOn(tasks.named("publishMavenJavaPublicationToMavenLocal"))
+
+    val localArtifactDir = file("${System.getProperty("user.home")}/.m2/repository/name/jurgenei/xml-sax-sexpr")
+    from(localArtifactDir)
+    into(layout.buildDirectory.dir("central-staging-repo/name/jurgenei/xml-sax-sexpr"))
+
+    doFirst {
+        if (!localArtifactDir.exists()) {
+            throw GradleException("Expected local Maven artifact directory not found: $localArtifactDir")
+        }
+    }
+}
+
+tasks.register<Zip>("packageCentralBundle") {
+    dependsOn(stageCentralBundleRepo)
+    archiveBaseName.set("xml-sax-sexpr")
+    archiveVersion.set(project.version.toString())
+    archiveClassifier.set("central-bundle")
+    destinationDirectory.set(layout.buildDirectory.dir("central-bundle"))
+    from(layout.buildDirectory.dir("central-staging-repo"))
 }
 

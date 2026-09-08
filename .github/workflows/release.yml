@@ -52,14 +52,28 @@ jobs:
       - name: Make wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Publish signed artifacts
+      - name: Build signed artifacts and bundle
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
           # ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.SIGNING_KEY_ID }}
-        run: ./gradlew clean publish --stacktrace --no-daemon --info | tee publish.log
+        run: ./gradlew clean packageCentralBundle --stacktrace --no-daemon --info | tee publish.log
+
+      - name: Upload bundle to Central Publisher API
+        env:
+          CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        run: |
+          BUNDLE_PATH="$(ls build/central-bundle/*-central-bundle.zip 2>/dev/null | head -n 1)"
+          if [ -z "$BUNDLE_PATH" ] || [ ! -f "$BUNDLE_PATH" ]; then
+            echo "Bundle not found: $BUNDLE_PATH"
+            exit 1
+          fi
+          curl --fail-with-body -sS -u "$CENTRAL_USERNAME:$CENTRAL_PASSWORD" \
+            -X POST "https://central.sonatype.com/api/v1/publisher/upload?nameSpace=name.jurgenei&publishingType=AUTOMATIC" \
+            -F "bundle=@$BUNDLE_PATH" | tee central-upload-response.json
 
       - name: Upload publish log
         if: ${{ always() }}
@@ -67,5 +81,13 @@ jobs:
         with:
           name: publish-log-${{ github.run_id }}
           path: publish.log
+          if-no-files-found: warn
+
+      - name: Upload Central response
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: central-response-${{ github.run_id }}
+          path: central-upload-response.json
           if-no-files-found: warn
 
