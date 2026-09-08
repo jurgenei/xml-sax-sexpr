@@ -13,7 +13,7 @@ plugins {
     jacoco
     `maven-publish`
     signing
-    id("org.owasp.dependencycheck") version "12.1.8"
+    id("org.owasp.dependencycheck") version "13.0.0"
     id("com.github.spotbugs") version "6.1.0"
 }
 
