@@ -90,7 +90,7 @@ jobs:
 
       - name: Upload publish log
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: publish-log-${{ github.run_id }}
           path: publish.log
@@ -98,7 +98,7 @@ jobs:
 
       - name: Upload Central response
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: central-response-${{ github.run_id }}
           path: central-upload-response.json
