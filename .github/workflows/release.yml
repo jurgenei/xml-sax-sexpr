@@ -74,21 +74,10 @@ jobs:
           # Backfill checksum sidecars in bundle so Central validation always sees md5/sha1 files.
           TMP_DIR="$(mktemp -d)"
           unzip -q "$BUNDLE_PATH" -d "$TMP_DIR"
-          python3 - <<'PY' "$TMP_DIR"
-import hashlib
-import pathlib
-import sys
-
-root = pathlib.Path(sys.argv[1])
-for p in sorted(root.rglob("*")):
-    if not p.is_file():
-        continue
-    if p.suffix in {".md5", ".sha1"}:
-        continue
-    data = p.read_bytes()
-    p.with_name(p.name + ".md5").write_text(hashlib.md5(data).hexdigest() + "\n", encoding="ascii")
-    p.with_name(p.name + ".sha1").write_text(hashlib.sha1(data).hexdigest() + "\n", encoding="ascii")
-PY
+          find "$TMP_DIR" -type f ! -name '*.md5' ! -name '*.sha1' -print0 | while IFS= read -r -d '' f; do
+            md5sum "$f" | awk '{print $1}' > "$f.md5"
+            sha1sum "$f" | awk '{print $1}' > "$f.sha1"
+          done
           rm -f "$BUNDLE_PATH"
           (
             cd "$TMP_DIR"
