@@ -149,13 +149,14 @@ tasks.named("check") {
 val stageCentralBundleRepo by tasks.registering(Sync::class) {
     dependsOn(tasks.named("publishMavenJavaPublicationToMavenLocal"))
 
-    val localArtifactDir = file("${System.getProperty("user.home")}/.m2/repository/name/jurgenei/xml-sax-sexpr")
-    from(localArtifactDir)
-    into(layout.buildDirectory.dir("central-staging-repo/name/jurgenei/xml-sax-sexpr"))
+    val artifactBaseDir = file("${System.getProperty("user.home")}/.m2/repository/name/jurgenei/xml-sax-sexpr")
+    val artifactVersionDir = file("$artifactBaseDir/${project.version}")
+    from(artifactVersionDir)
+    into(layout.buildDirectory.dir("central-staging-repo/name/jurgenei/xml-sax-sexpr/${project.version}"))
 
     doFirst {
-        if (!localArtifactDir.exists()) {
-            throw GradleException("Expected local Maven artifact directory not found: $localArtifactDir")
+        if (!artifactVersionDir.exists()) {
+            throw GradleException("Expected local Maven artifact version directory not found: $artifactVersionDir")
         }
     }
 }
