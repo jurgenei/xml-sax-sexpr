@@ -7,6 +7,11 @@ on:
     branches: ["main", "release/**"]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pull-requests: read
+  id-token: write
+
 jobs:
   coverage:
     runs-on: ubuntu-latest
@@ -37,5 +42,6 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: jurgenei/xml-sax-sexpr
+          use_oidc: true
+          files: build/reports/jacoco/test/jacocoTestReport.xml
+          fail_ci_if_error: false

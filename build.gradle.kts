@@ -13,6 +13,8 @@ plugins {
     jacoco
     `maven-publish`
     signing
+    id("org.owasp.dependencycheck") version "12.1.8"
+    id("com.github.spotbugs") version "6.1.0"
 }
 
 group = "name.jurgenei"
@@ -32,6 +34,7 @@ java {
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
+    add("spotbugsPlugins", "com.h3xstream.findsecbugs:findsecbugs-plugin:1.14.0")
 }
 
 publishing {
@@ -207,3 +210,39 @@ tasks.register<Zip>("packageCentralBundle") {
     from(layout.buildDirectory.dir("central-staging-repo"))
 }
 
+extensions.getByName("dependencyCheck").withGroovyBuilder {
+    setProperty("formats", listOf("HTML", "JSON", "XML"))
+    setProperty("failBuildOnCVSS", 7.0f)
+    setProperty("suppressionFile", "dependency-check-suppressions.xml")
+    setProperty("skipConfigurations", listOf("spotbugs", "spotbugsPlugins"))
+
+    getProperty("nvd").withGroovyBuilder {
+        setProperty(
+            "apiKey",
+            providers.gradleProperty("org.owasp.dependencycheck.nvd.api.key").orNull
+                ?: System.getenv("NVD_API_KEY")
+        )
+    }
+}
+
+tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
+    ignoreFailures = providers.gradleProperty("spotbugsIgnoreFailures")
+        .map { it.toBoolean() }
+        .orElse(true)
+        .get()
+    effort = com.github.spotbugs.snom.Effort.DEFAULT
+    reportLevel = com.github.spotbugs.snom.Confidence.MEDIUM
+    excludeFilter.set(file("spotbugs-exclude.xml"))
+    reports.create("html").required.set(true)
+    reports.create("xml").required.set(false)
+}
+
+tasks.register("allSecurityChecks") {
+    group = "verification"
+    description = "Run all security checks (Dependency-Check and SpotBugs)."
+    dependsOn("check", "spotbugsMain")
+    val dependencyCheckTask = tasks.findByName("dependencyCheckAnalyze") ?: tasks.findByName("dependencyCheck")
+    if (dependencyCheckTask != null) {
+        dependsOn(dependencyCheckTask)
+    }
+}
