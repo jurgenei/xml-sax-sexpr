@@ -9,7 +9,6 @@ plugins {
     jacoco
     `maven-publish`
     signing
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
 group = "name.jurgenei"
@@ -67,16 +66,15 @@ publishing {
 
     repositories {
         mavenLocal()
-    }
-}
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(providers.gradleProperty("mavenCentralUsername"))
-            password.set(providers.gradleProperty("mavenCentralPassword"))
+        maven {
+            name = "sonatype"
+            val releasesRepoUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
+            val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
+            credentials {
+                username = providers.gradleProperty("mavenCentralUsername").orNull
+                password = providers.gradleProperty("mavenCentralPassword").orNull
+            }
         }
     }
 }
