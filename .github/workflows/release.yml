@@ -61,5 +61,13 @@ jobs:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
           # ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.SIGNING_KEY_ID }}
-        run: ./gradlew clean publish --stacktrace --no-daemon
+        run: ./gradlew clean publish --stacktrace --no-daemon --info | tee publish.log
+
+      - name: Upload publish log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-log-${{ github.run_id }}
+          path: publish.log
+          if-no-files-found: warn
 
