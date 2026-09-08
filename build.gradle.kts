@@ -12,7 +12,7 @@ plugins {
     signing
 }
 
-group = "name.jurgenei.xml"
+group = "name.jurgenei"
 version = "0.1.0"
 
 repositories {
@@ -37,7 +37,7 @@ publishing {
             from(components["java"])
 
             pom {
-                name.set("sax-sexpr")
+                name.set("xml-sax-sexpr")
                 description.set("SAX parser/serializer and XMLReader for bracket-based XML/XDM S-expressions")
                 url.set("https://github.com/jurgenei/xml-sax-sexpr")
 
@@ -51,7 +51,7 @@ publishing {
                 developers {
                     developer {
                         id.set("jurgenei")
-                        name.set("Jurgenei")
+                        name.set("Jurgen Hildebrand")
                     }
                 }
 
