@@ -54,14 +54,12 @@ jobs:
 
       - name: Publish signed artifacts
         env:
-          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME || secrets.OSSRH_USERNAME }}
-          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD || secrets.OSSRH_PASSWORD }}
-          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.OSSRH_USERNAME || secrets.MAVEN_CENTRAL_USERNAME }}
-          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.OSSRH_PASSWORD || secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
           # ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.SIGNING_KEY_ID }}
-        run: ./gradlew clean publish --stacktrace --no-daemon --info | tee publish.log
+        run: ./gradlew clean publishToSonatype closeAndReleaseSonatypeStagingRepository --stacktrace --no-daemon --info | tee publish.log
 
       - name: Upload publish log
         if: ${{ always() }}
