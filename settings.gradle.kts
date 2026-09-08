@@ -1,2 +1,2 @@
-rootProject.name = "sax-sexpr"
+rootProject.name = "xml-sax-sexpr"
 

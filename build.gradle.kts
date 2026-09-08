@@ -1,6 +1,5 @@
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.testing.Test
-import org.gradle.plugins.signing.Sign
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
 import org.gradle.testing.jacoco.tasks.JacocoReport
@@ -35,6 +34,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
+            artifactId = "xml-sax-sexpr"
 
             pom {
                 name.set("xml-sax-sexpr")
@@ -68,7 +68,7 @@ publishing {
         mavenLocal()
         maven {
             name = "sonatype"
-            val releasesRepoUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
+            val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
             credentials {
@@ -88,8 +88,8 @@ signing {
     val signingPassword = providers.gradleProperty("signingPassword").orNull
     val signingKeyId = providers.gradleProperty("signingKeyId").orNull
 
-    if (!signingKey.isNullOrBlank() && !signingPassword.isNullOrBlank()) {
-        if (!signingKeyId.isNullOrBlank()) {
+    if (!signingKey.isNullOrEmpty() && !signingPassword.isNullOrEmpty()) {
+        if (!signingKeyId.isNullOrEmpty()) {
             useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
         } else {
             useInMemoryPgpKeys(signingKey, signingPassword)
@@ -101,13 +101,6 @@ signing {
     sign(publishing.publications)
 }
 
-tasks.withType<Sign>().configureEach {
-    onlyIf {
-        gradle.taskGraph.allTasks.any { task ->
-            task.name.startsWith("publish") || task.name.startsWith("sign")
-        }
-    }
-}
 
 tasks.withType<Test>().configureEach {
     useJUnit()
