@@ -71,6 +71,30 @@ jobs:
             echo "Bundle not found: $BUNDLE_PATH"
             exit 1
           fi
+          # Backfill checksum sidecars in bundle so Central validation always sees md5/sha1 files.
+          TMP_DIR="$(mktemp -d)"
+          unzip -q "$BUNDLE_PATH" -d "$TMP_DIR"
+          python3 - <<'PY' "$TMP_DIR"
+import hashlib
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1])
+for p in sorted(root.rglob("*")):
+    if not p.is_file():
+        continue
+    if p.suffix in {".md5", ".sha1"}:
+        continue
+    data = p.read_bytes()
+    p.with_name(p.name + ".md5").write_text(hashlib.md5(data).hexdigest() + "\n", encoding="ascii")
+    p.with_name(p.name + ".sha1").write_text(hashlib.sha1(data).hexdigest() + "\n", encoding="ascii")
+PY
+          rm -f "$BUNDLE_PATH"
+          (
+            cd "$TMP_DIR"
+            zip -qr "$OLDPWD/$BUNDLE_PATH" .
+          )
+          rm -rf "$TMP_DIR"
           curl --fail-with-body -sS -u "$CENTRAL_USERNAME:$CENTRAL_PASSWORD" \
             -X POST "https://central.sonatype.com/api/v1/publisher/upload?nameSpace=name.jurgenei&publishingType=AUTOMATIC" \
             -F "bundle=@$BUNDLE_PATH" | tee central-upload-response.json

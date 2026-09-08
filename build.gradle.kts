@@ -6,6 +6,7 @@ import org.gradle.api.tasks.bundling.Zip
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
 import org.gradle.testing.jacoco.tasks.JacocoReport
+import java.security.MessageDigest
 
 plugins {
     `java-library`
@@ -161,8 +162,44 @@ val stageCentralBundleRepo by tasks.registering(Sync::class) {
     }
 }
 
-tasks.register<Zip>("packageCentralBundle") {
+val generateCentralBundleChecksums by tasks.registering {
     dependsOn(stageCentralBundleRepo)
+    notCompatibleWithConfigurationCache("Generates checksum files by scanning staged output directory at execution time.")
+
+    doLast {
+        val stagedVersionDir = layout.buildDirectory
+            .dir("central-staging-repo/name/jurgenei/xml-sax-sexpr/${project.version}")
+            .get()
+            .asFile
+
+        if (!stagedVersionDir.exists()) {
+            throw GradleException("Expected staged version directory not found: $stagedVersionDir")
+        }
+
+        fun checksum(file: java.io.File, algorithm: String): String {
+            val digest = MessageDigest.getInstance(algorithm)
+            file.inputStream().use { input ->
+                val buffer = ByteArray(8192)
+                while (true) {
+                    val read = input.read(buffer)
+                    if (read < 0) break
+                    digest.update(buffer, 0, read)
+                }
+            }
+            return digest.digest().joinToString("") { "%02x".format(it.toInt() and 0xff) }
+        }
+
+        stagedVersionDir.walkTopDown()
+            .filter { it.isFile && !it.name.endsWith(".md5") && !it.name.endsWith(".sha1") }
+            .forEach { file ->
+                file.resolveSibling("${file.name}.md5").writeText("${checksum(file, "MD5")}\n")
+                file.resolveSibling("${file.name}.sha1").writeText("${checksum(file, "SHA-1")}\n")
+            }
+    }
+}
+
+tasks.register<Zip>("packageCentralBundle") {
+    dependsOn(generateCentralBundleChecksums)
     archiveBaseName.set("xml-sax-sexpr")
     archiveVersion.set(project.version.toString())
     archiveClassifier.set("central-bundle")
