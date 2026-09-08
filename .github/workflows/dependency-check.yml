@@ -32,10 +32,35 @@ jobs:
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
 
-      - name: Run OWASP Dependency-Check
+      - name: Run OWASP Dependency-Check (retry on transient NVD update failures)
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        run: ./gradlew dependencyCheckAnalyze --no-daemon --no-configuration-cache --stacktrace
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          max_attempts=3
+          attempt=1
+
+          while [ "$attempt" -le "$max_attempts" ]; do
+            echo "Dependency-Check attempt $attempt/$max_attempts"
+
+            if ./gradlew dependencyCheckAnalyze --no-daemon --no-configuration-cache --stacktrace; then
+              echo "Dependency-Check completed on attempt $attempt"
+              exit 0
+            fi
+
+            if [ "$attempt" -lt "$max_attempts" ]; then
+              sleep_seconds=$((attempt * 30))
+              echo "Dependency-Check failed. Sleeping ${sleep_seconds}s before retry."
+              sleep "$sleep_seconds"
+            fi
+
+            attempt=$((attempt + 1))
+          done
+
+          echo "Dependency-Check failed after $max_attempts attempts"
+          exit 1
 
       - name: Upload Dependency-Check HTML report
         if: always()
@@ -63,4 +88,3 @@ jobs:
         run: |
           echo "### OWASP Dependency-Check" >> "$GITHUB_STEP_SUMMARY"
           echo "- Reports uploaded as workflow artifacts." >> "$GITHUB_STEP_SUMMARY"
-
