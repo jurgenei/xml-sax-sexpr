@@ -7,7 +7,7 @@
 [![Dependency Check](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/dependency-check.yml/badge.svg)](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/dependency-check.yml)
 [![SpotBugs Security](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/spotbugs-security.yml/badge.svg)](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/spotbugs-security.yml)
 [![Dependabot](https://img.shields.io/badge/dependabot-enabled-025E8C?logo=dependabot)](https://github.com/jurgenei/xml-sax-sexpr/security/dependabot)
-[![Coverage](https://codecov.io/gh/jurgenei/xml-sax-sexpr/graph/badge.svg)](https://codecov.io/gh/jurgenei/xml-sax-sexpr)
+[![Coverage](https://codecov.io/gh/jurgenei/xml-sax-sexpr/graph/badge.svg?branch=main)](https://codecov.io/gh/jurgenei/xml-sax-sexpr?branch=main)
 [![Maven Central](https://img.shields.io/maven-central/v/name.jurgenei/xml-sax-sexpr.svg)](https://search.maven.org/artifact/name.jurgenei/xml-sax-sexpr)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Java](https://img.shields.io/badge/java-21+-green.svg)](https://www.oracle.com/java/)
