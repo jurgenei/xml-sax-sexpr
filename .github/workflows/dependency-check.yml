@@ -41,13 +41,22 @@ jobs:
 
           max_attempts=3
           attempt=1
+          gradle_nvd_override=()
 
           while [ "$attempt" -le "$max_attempts" ]; do
             echo "Dependency-Check attempt $attempt/$max_attempts"
 
-            if ./gradlew dependencyCheckAnalyze --no-daemon --no-configuration-cache --stacktrace; then
+            log_file="dependency-check-attempt-${attempt}.log"
+            if ./gradlew dependencyCheckAnalyze --no-daemon --no-configuration-cache --stacktrace "${gradle_nvd_override[@]}" 2>&1 | tee "$log_file"; then
               echo "Dependency-Check completed on attempt $attempt"
               exit 0
+            fi
+
+            # Invalid/revoked key causes hard-fail; clear key and retry unauthenticated.
+            if grep -q "Invalid API Key" "$log_file"; then
+              echo "Detected invalid NVD API key. Retrying without NVD_API_KEY."
+              unset NVD_API_KEY
+              gradle_nvd_override=(-Dorg.owasp.dependencycheck.nvd.api.key=)
             fi
 
             if [ "$attempt" -lt "$max_attempts" ]; then
