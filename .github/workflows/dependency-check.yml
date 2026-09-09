@@ -64,21 +64,21 @@ jobs:
 
       - name: Upload Dependency-Check HTML report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dependency-check-html
           path: build/reports/dependency-check-report.html
 
       - name: Upload Dependency-Check XML report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dependency-check-xml
           path: build/reports/dependency-check-report.xml
 
       - name: Upload Dependency-Check JSON report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dependency-check-json
           path: build/reports/dependency-check-report.json

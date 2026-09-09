@@ -33,7 +33,7 @@ jobs:
 
       - name: Upload SpotBugs HTML report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: spotbugs-html
           path: build/reports/spotbugs/main.html
