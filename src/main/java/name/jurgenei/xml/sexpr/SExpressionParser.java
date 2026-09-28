@@ -470,11 +470,11 @@ public final class SExpressionParser {
         handler.startElement(elementUri, elementLocal, node.name, attributes);
 
         for (Item child : node.children) {
-            if (child instanceof TextNode textNode) {
-                if (textNode.value.isBlank()) {
+            if (child instanceof TextNode(String value1)) {
+                if (value1.isBlank()) {
                     continue;
                 }
-                char[] chars = textNode.value.toCharArray();
+                char[] chars = value1.toCharArray();
                 handler.characters(chars, 0, chars.length);
             } else if (child instanceof AtomicNode atomicNode) {
                 emitAtomic(atomicNode, handler);
@@ -490,13 +490,13 @@ public final class SExpressionParser {
                 for (Item nestedChild : documentNode.children) {
                     emitItemAtDocumentLevel(nestedChild, handler, lexical, namespaceStack);
                 }
-            } else if (child instanceof CommentNode commentNode) {
+            } else if (child instanceof CommentNode(String value)) {
                 if (lexical != null) {
-                    char[] chars = commentNode.value.toCharArray();
+                    char[] chars = value.toCharArray();
                     lexical.comment(chars, 0, chars.length);
                 }
-            } else if (child instanceof PiNode piNode) {
-                handler.processingInstruction(piNode.target, toPiData(piNode.tokens));
+            } else if (child instanceof PiNode(String target, List<PiToken> tokens)) {
+                handler.processingInstruction(target, toPiData(tokens));
             }
         }
 
@@ -509,11 +509,11 @@ public final class SExpressionParser {
     }
 
     private void emitDocumentRoot(Item root, ContentHandler handler, LexicalHandler lexical, Deque<Map<String, String>> namespaceStack) throws SAXException {
-        if (root instanceof DocumentNode documentNode) {
-            if (documentNode.xmlDeclaration != null) {
-                emitXmlDeclaration(documentNode.xmlDeclaration, handler);
+        if (root instanceof DocumentNode(XmlDeclarationNode xmlDeclaration, List<Item> children)) {
+            if (xmlDeclaration != null) {
+                emitXmlDeclaration(xmlDeclaration, handler);
             }
-            for (Item item : documentNode.children) {
+            for (Item item : children) {
                 emitItemAtDocumentLevel(item, handler, lexical, namespaceStack);
             }
             return;
@@ -526,19 +526,19 @@ public final class SExpressionParser {
             emitElement(elementNode, handler, lexical, namespaceStack);
             return;
         }
-        if (item instanceof CommentNode commentNode) {
+        if (item instanceof CommentNode(String value1)) {
             if (lexical != null) {
-                char[] chars = commentNode.value.toCharArray();
+                char[] chars = value1.toCharArray();
                 lexical.comment(chars, 0, chars.length);
             }
             return;
         }
-        if (item instanceof PiNode piNode) {
-            handler.processingInstruction(piNode.target, toPiData(piNode.tokens));
+        if (item instanceof PiNode(String target, List<PiToken> tokens)) {
+            handler.processingInstruction(target, toPiData(tokens));
             return;
         }
-        if (item instanceof TextNode textNode) {
-            char[] chars = textNode.value.toCharArray();
+        if (item instanceof TextNode(String value)) {
+            char[] chars = value.toCharArray();
             handler.characters(chars, 0, chars.length);
             return;
         }
@@ -621,27 +621,27 @@ public final class SExpressionParser {
             emitAtomic(atomicNode, handler);
             return;
         }
-        if (value instanceof TextNode textNode) {
-            AtomicNode atomicNode = new AtomicNode(textNode.value, true);
+        if (value instanceof TextNode(String value2)) {
+            AtomicNode atomicNode = new AtomicNode(value2, true);
             emitAtomic(atomicNode, handler);
             return;
         }
-        if (value instanceof CommentNode commentNode) {
+        if (value instanceof CommentNode(String value1)) {
             if (lexical != null) {
-                char[] chars = commentNode.value.toCharArray();
+                char[] chars = value1.toCharArray();
                 lexical.comment(chars, 0, chars.length);
             }
             return;
         }
-        if (value instanceof PiNode piNode) {
-            handler.processingInstruction(piNode.target, toPiData(piNode.tokens));
+        if (value instanceof PiNode(String target, List<PiToken> tokens)) {
+            handler.processingInstruction(target, toPiData(tokens));
             return;
         }
-        if (value instanceof DocumentNode documentNode) {
-            if (documentNode.xmlDeclaration != null) {
-                emitXmlDeclaration(documentNode.xmlDeclaration, handler);
+        if (value instanceof DocumentNode(XmlDeclarationNode xmlDeclaration, List<Item> children)) {
+            if (xmlDeclaration != null) {
+                emitXmlDeclaration(xmlDeclaration, handler);
             }
-            for (Item child : documentNode.children) {
+            for (Item child : children) {
                 emitInternalValue(child, handler, lexical, namespaceStack);
             }
         }

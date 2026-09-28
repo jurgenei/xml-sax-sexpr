@@ -179,7 +179,7 @@ val generateCentralBundleChecksums by tasks.registering {
             throw GradleException("Expected staged version directory not found: $stagedVersionDir")
         }
 
-        fun checksum(file: java.io.File, algorithm: String): String {
+        fun checksum(file: File, algorithm: String): String {
             val digest = MessageDigest.getInstance(algorithm)
             file.inputStream().use { input ->
                 val buffer = ByteArray(8192)

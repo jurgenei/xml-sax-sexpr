@@ -481,11 +481,10 @@ public final class SExpressionSerializer implements ContentHandler, LexicalHandl
 
     private String renderMap(NodeFrame frame, int depth) {
         if (format == OutputFormat.BEAUTIFIED) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(indent(depth)).append("(xdm:map");
-            sb.append('\n').append(renderMapPayloadBeautified(frame, depth + 1));
-            sb.append(')');
-            return sb.toString();
+            String sb = indent(depth) + "(xdm:map" +
+                    '\n' + renderMapPayloadBeautified(frame, depth + 1) +
+                    ')';
+            return sb;
         }
         return "(xdm:map " + renderMapPayloadCompact(frame, depth + 1) + ')';
     }
@@ -530,11 +529,10 @@ public final class SExpressionSerializer implements ContentHandler, LexicalHandl
 
     private String renderArray(NodeFrame frame, int depth) {
         if (format == OutputFormat.BEAUTIFIED) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(indent(depth)).append("(xdm:array");
-            sb.append('\n').append(renderArrayPayloadBeautified(frame, depth + 1));
-            sb.append(')');
-            return sb.toString();
+            String sb = indent(depth) + "(xdm:array" +
+                    '\n' + renderArrayPayloadBeautified(frame, depth + 1) +
+                    ')';
+            return sb;
         }
         return "(xdm:array " + renderArrayPayloadCompact(frame, depth + 1) + ')';
     }
@@ -808,59 +806,39 @@ public final class SExpressionSerializer implements ContentHandler, LexicalHandl
     private record PiNode(String target, List<PiToken> tokens) {
     }
 
-    private static final class Child {
-        private final NodeFrame node;
-        private final String text;
-        private final String comment;
-        private final PiNode pi;
-
-        private Child(NodeFrame node, String text, String comment, PiNode pi) {
-            this.node = node;
-            this.text = text;
-            this.comment = comment;
-            this.pi = pi;
-        }
+    private record Child(NodeFrame node, String text, String comment, PiNode pi) {
 
         private static Child node(NodeFrame node) {
-            return new Child(node, null, null, null);
+                return new Child(node, null, null, null);
+            }
+
+            private static Child text(String text) {
+                return new Child(null, text, null, null);
+            }
+
+            private static Child comment(String comment) {
+                return new Child(null, null, comment, null);
+            }
+
+            private static Child pi(PiNode pi) {
+                return new Child(null, null, null, pi);
+            }
         }
 
-        private static Child text(String text) {
-            return new Child(null, text, null, null);
-        }
-
-        private static Child comment(String comment) {
-            return new Child(null, null, comment, null);
-        }
-
-        private static Child pi(PiNode pi) {
-            return new Child(null, null, null, pi);
-        }
-    }
-
-    private static final class DocNode {
-        private final NodeFrame node;
-        private final String comment;
-        private final PiNode pi;
-
-        private DocNode(NodeFrame node, String comment, PiNode pi) {
-            this.node = node;
-            this.comment = comment;
-            this.pi = pi;
-        }
+    private record DocNode(NodeFrame node, String comment, PiNode pi) {
 
         private static DocNode node(NodeFrame node) {
-            return new DocNode(node, null, null);
-        }
+                return new DocNode(node, null, null);
+            }
 
-        private static DocNode comment(String comment) {
-            return new DocNode(null, comment, null);
-        }
+            private static DocNode comment(String comment) {
+                return new DocNode(null, comment, null);
+            }
 
-        private static DocNode pi(PiNode pi) {
-            return new DocNode(null, null, pi);
+            private static DocNode pi(PiNode pi) {
+                return new DocNode(null, null, pi);
+            }
         }
-    }
 
     private static final class Cursor {
         private final String source;
