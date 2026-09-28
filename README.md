@@ -1,5 +1,7 @@
 # xml-sax-sexpr
 
+to be obsoleted, will be renamed to [xir-sax](https://github.com/jurgenei/xir-sax)
+
 [![Build](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/ci.yml/badge.svg)](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/ci.yml)
 [![Release](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/release.yml/badge.svg)](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/release.yml)
 [![Coverage CI](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/coverage.yml/badge.svg)](https://github.com/jurgenei/xml-sax-sexpr/actions/workflows/coverage.yml)
